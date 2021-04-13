@@ -11,6 +11,7 @@ use CultuurNet\UDB3\Http\ApiProblemJsonResponseTrait;
 use CultuurNet\UDB3\Http\JsonLdResponse;
 use CultuurNet\UDB3\ReadModel\DocumentDoesNotExist;
 use CultuurNet\UDB3\ReadModel\DocumentRepository;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,14 +32,16 @@ class ReadPlaceRestController
         $this->documentRepository = $documentRepository;
     }
 
-    public function get(string $cdbid, Request $request): JsonResponse
+    public function get(ServerRequestInterface $request): JsonResponse
     {
-        $includeMetadata = (bool) $request->query->get('includeMetadata', false);
+        $placeId = $request->getAttribute('cdbid');
+        $queryParams = $request->getQueryParams();
+        $includeMetadata = (bool) $queryParams['includeMetadata'];
 
         try {
-            $place = $this->documentRepository->fetch($cdbid, $includeMetadata);
+            $place = $this->documentRepository->fetch($placeId, $includeMetadata);
         } catch (DocumentDoesNotExist $e) {
-            return $this->createApiProblemJsonResponseNotFound(self::GET_ERROR_NOT_FOUND, $cdbid);
+            return $this->createApiProblemJsonResponseNotFound(self::GET_ERROR_NOT_FOUND, $placeId);
         }
 
         $response = JsonLdResponse::create()
