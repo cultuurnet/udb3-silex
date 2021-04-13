@@ -7,7 +7,6 @@ namespace CultuurNet\UDB3\Http\Place;
 use CultuurNet\CalendarSummaryV3\CalendarHTMLFormatter;
 use CultuurNet\CalendarSummaryV3\CalendarPlainTextFormatter;
 use CultuurNet\CalendarSummaryV3\Offer\Offer;
-use CultuurNet\UDB3\Http\ApiProblemJsonResponseTrait;
 use CultuurNet\UDB3\Http\Response\ApiProblemJsonResponse;
 use CultuurNet\UDB3\Http\Response\JsonLdResponse;
 use CultuurNet\UDB3\ReadModel\DocumentDoesNotExist;
@@ -18,7 +17,6 @@ use Zend\Diactoros\Response\JsonResponse;
 
 class ReadPlaceRestController
 {
-    use ApiProblemJsonResponseTrait;
     private const GET_ERROR_NOT_FOUND = 'An error occurred while getting the event with id %s!';
 
     /**
