@@ -16,9 +16,7 @@ class DeprecatedPlaceControllerProvider implements ControllerProviderInterface
         /** @var ControllerCollection $controllers */
         $controllers = $app['controllers_factory'];
 
-        $controllers
-            ->get('place/{cdbid}', ReadPlaceRestController::class . ':get')
-            ->bind('place');
+        $controllers->get('place/{cdbid}', ReadPlaceRestController::class . ':get');
         $controllers->delete('place/{cdbid}', 'place_editing_controller:deletePlace');
         $controllers->get('place/{cdbid}/events', 'place_editing_controller:getEvents');
 
