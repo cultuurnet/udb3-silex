@@ -52,19 +52,22 @@ class ReadPlaceRestController
         return $response;
     }
 
-    public function getCalendarSummary($cdbid, Request $request): Response
+    public function getCalendarSummary(ServerRequestInterface $request): Response
     {
-        $style = $request->query->get('style', 'text');
-        $langCode = $request->query->get('langCode', 'nl_BE');
-        $hidePastDates = $request->query->get('hidePast', false);
-        $timeZone = $request->query->get('timeZone', 'Europe/Brussels');
-        $format = $request->query->get('format', 'lg');
+        $placeId = $request->getAttribute('cdbid');
+        $queryParams = $request->getQueryParams();
 
-        $data = $this->documentRepository->fetch($cdbid, false);
+        $style = $queryParams['style'] ?? 'text';
+        $langCode = $queryParams['langCode'] ?? 'nl_BE';
+        $hidePastDates = $queryParams['hidePast'] ?? false;
+        $timeZone = $queryParams['timeZone'] ?? 'Europe/Brussels';
+        $format = $queryParams['format'] ?? 'lg';
+
+        $data = $this->documentRepository->fetch($placeId, false);
         $place = Offer::fromJsonLd($data->getRawBody());
 
         if ($style !== 'html' && $style !== 'text') {
-            return $this->createApiProblemJsonResponseNotFound('No style found for ' . $style, $cdbid);
+            return $this->createApiProblemJsonResponseNotFound('No style found for ' . $style, $placeId);
         }
 
         if ($style === 'html') {
