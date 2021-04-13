@@ -63,9 +63,6 @@ class ReadPlaceRestController
         $timeZone = $queryParams['timeZone'] ?? 'Europe/Brussels';
         $format = $queryParams['format'] ?? 'lg';
 
-        $data = $this->documentRepository->fetch($placeId, false);
-        $place = Offer::fromJsonLd($data->getRawBody());
-
         if ($style !== 'html' && $style !== 'text') {
             return $this->createApiProblemJsonResponseNotFound('No style found for ' . $style, $placeId);
         }
@@ -75,6 +72,9 @@ class ReadPlaceRestController
         } else {
             $calSum = new CalendarPlainTextFormatter($langCode, $hidePastDates, $timeZone);
         }
+
+        $data = $this->documentRepository->fetch($placeId, false);
+        $place = Offer::fromJsonLd($data->getRawBody());
 
         return new Response($calSum->format($place, $format));
     }
