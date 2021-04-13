@@ -29,4 +29,12 @@ class ApiProblemJsonResponse extends JsonResponse
             $headers
         );
     }
+
+    public static function notFound(string $message): self
+    {
+        $apiProblem = new ApiProblem($message);
+        $apiProblem->setStatus(404);
+
+        return new self($apiProblem);
+    }
 }

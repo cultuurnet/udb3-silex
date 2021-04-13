@@ -8,13 +8,13 @@ use CultuurNet\CalendarSummaryV3\CalendarHTMLFormatter;
 use CultuurNet\CalendarSummaryV3\CalendarPlainTextFormatter;
 use CultuurNet\CalendarSummaryV3\Offer\Offer;
 use CultuurNet\UDB3\Http\ApiProblemJsonResponseTrait;
-use CultuurNet\UDB3\Http\JsonLdResponse;
+use CultuurNet\UDB3\Http\Response\ApiProblemJsonResponse;
+use CultuurNet\UDB3\Http\Response\JsonLdResponse;
 use CultuurNet\UDB3\ReadModel\DocumentDoesNotExist;
 use CultuurNet\UDB3\ReadModel\DocumentRepository;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\Response\JsonResponse;
 
 class ReadPlaceRestController
 {
@@ -41,15 +41,10 @@ class ReadPlaceRestController
         try {
             $place = $this->documentRepository->fetch($placeId, $includeMetadata);
         } catch (DocumentDoesNotExist $e) {
-            return $this->createApiProblemJsonResponseNotFound(self::GET_ERROR_NOT_FOUND, $placeId);
+            return ApiProblemJsonResponse::notFound(sprintf(self::GET_ERROR_NOT_FOUND, $placeId));
         }
 
-        $response = JsonLdResponse::create()
-            ->setContent($place->getRawBody());
-
-        $response->headers->set('Vary', 'Origin');
-
-        return $response;
+        return new JsonLdResponse($place->getRawBody(), 200, ['Vary' => 'Origin']);
     }
 
     public function getCalendarSummary(ServerRequestInterface $request): Response
@@ -71,7 +66,7 @@ class ReadPlaceRestController
                 $calSum = new CalendarPlainTextFormatter($langCode, $hidePastDates, $timeZone);
                 break;
             default:
-                return $this->createApiProblemJsonResponseNotFound('No style found for ' . $style, $placeId);
+                return ApiProblemJsonResponse::notFound("No $style calendar summary found for place with id $placeId");
         }
 
         $data = $this->documentRepository->fetch($placeId, false);
