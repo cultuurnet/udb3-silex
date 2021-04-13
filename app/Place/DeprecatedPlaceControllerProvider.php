@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CultuurNet\UDB3\Silex\Place;
 
+use CultuurNet\UDB3\Http\Place\ReadPlaceRestController;
 use Silex\Application;
 use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
@@ -16,7 +17,7 @@ class DeprecatedPlaceControllerProvider implements ControllerProviderInterface
         $controllers = $app['controllers_factory'];
 
         $controllers
-            ->get('place/{cdbid}', 'place_controller:get')
+            ->get('place/{cdbid}', ReadPlaceRestController::class . ':get')
             ->bind('place');
         $controllers->delete('place/{cdbid}', 'place_editing_controller:deletePlace');
         $controllers->get('place/{cdbid}/events', 'place_editing_controller:getEvents');

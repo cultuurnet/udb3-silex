@@ -20,7 +20,7 @@ class PlaceControllerProvider implements ControllerProviderInterface
      */
     public function connect(Application $app)
     {
-        $app['place_controller'] = $app->share(
+        $app[ReadPlaceRestController::class] = $app->share(
             function (Application $app) {
                 return new ReadPlaceRestController($app['place_jsonld_repository']);
             }
@@ -56,7 +56,7 @@ class PlaceControllerProvider implements ControllerProviderInterface
         $controllers = $app['controllers_factory'];
 
         $controllers->post('/', 'place_editing_controller:createPlace');
-        $controllers->get('/{cdbid}', 'place_controller:get');
+        $controllers->get('/{cdbid}', ReadPlaceRestController::class . ':get');
         $controllers->delete('/{cdbid}', 'place_editing_controller:deletePlace');
 
         $controllers->get('/{placeId}/history', 'place_history_controller:get');
@@ -74,7 +74,7 @@ class PlaceControllerProvider implements ControllerProviderInterface
         $controllers->delete('/{itemId}/images/{mediaObjectId}', 'place_editing_controller:removeImage');
         $controllers->put('/{itemId}/images/{mediaObjectId}', 'place_editing_controller:updateImage');
 
-        $controllers->get('/{cdbid}/calsum', 'place_controller:getCalendarSummary');
+        $controllers->get('/{cdbid}/calsum', ReadPlaceRestController::class . ':getCalendarSummary');
         $controllers->put('/{offerId}/status', UpdateStatusRequestHandler::class . ':handle');
 
         return $controllers;
