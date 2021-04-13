@@ -17,8 +17,6 @@ use Zend\Diactoros\Response\JsonResponse;
 
 class ReadPlaceRestController
 {
-    private const GET_ERROR_NOT_FOUND = 'An error occurred while getting the event with id %s!';
-
     /**
      * @var DocumentRepository
      */
@@ -39,7 +37,7 @@ class ReadPlaceRestController
         try {
             $place = $this->documentRepository->fetch($placeId, $includeMetadata);
         } catch (DocumentDoesNotExist $e) {
-            return ApiProblemJsonResponse::notFound(sprintf(self::GET_ERROR_NOT_FOUND, $placeId));
+            return ApiProblemJsonResponse::notFound("No place found for id $placeId");
         }
 
         return new JsonLdResponse($place->getRawBody(), 200, ['Vary' => 'Origin']);
