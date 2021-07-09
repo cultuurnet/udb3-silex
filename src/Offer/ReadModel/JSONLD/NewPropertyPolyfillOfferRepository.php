@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CultuurNet\UDB3\Offer\ReadModel\JSONLD;
 
+use CultuurNet\UDB3\Event\ValueObjects\BookingAvailability;
 use CultuurNet\UDB3\Event\ValueObjects\StatusType;
 use CultuurNet\UDB3\ReadModel\DocumentRepositoryDecorator;
 use CultuurNet\UDB3\ReadModel\JsonDocument;
@@ -23,9 +24,10 @@ final class NewPropertyPolyfillOfferRepository extends DocumentRepositoryDecorat
         return $jsonDocument->applyAssoc(
             function (array $json) {
                 $json = $this->polyfillStatus($json);
-                $json = $this->polyfillSubEventStatus($json);
+                $json = $this->polyfillBookingAvailability($json);
+                $json = $this->polyfillSubEventStatusAndBookingAvailability($json);
                 $json = $this->polyfillEmbeddedPlaceStatus($json);
-                return $json;
+                return $this->polyfillEmbeddedPlaceBookingAvailability($json);
             }
         );
     }
@@ -48,7 +50,16 @@ final class NewPropertyPolyfillOfferRepository extends DocumentRepositoryDecorat
         return $json;
     }
 
-    private function polyfillSubEventStatus(array $json): array
+    private function polyfillBookingAvailability(array $json): array
+    {
+        if (!isset($json['bookingAvailability'])) {
+            $json['bookingAvailability'] = BookingAvailability::available()->serialize();
+        }
+
+        return $json;
+    }
+
+    private function polyfillSubEventStatusAndBookingAvailability(array $json): array
     {
         if (!isset($json['subEvent']) || !is_array($json['subEvent'])) {
             return $json;
@@ -61,6 +72,7 @@ final class NewPropertyPolyfillOfferRepository extends DocumentRepositoryDecorat
                         'status' => [
                             'type' => StatusType::available()->toNative(),
                         ],
+                        'bookingAvailability' => BookingAvailability::available()->serialize(),
                     ],
                     $subEvent
                 );
@@ -87,6 +99,19 @@ final class NewPropertyPolyfillOfferRepository extends DocumentRepositoryDecorat
             $json['location']['status'] = [
                 'type' => StatusType::available()->toNative(),
             ];
+        }
+
+        return $json;
+    }
+
+    private function polyfillEmbeddedPlaceBookingAvailability(array $json): array
+    {
+        if (!isset($json['location'])) {
+            return $json;
+        }
+
+        if (!isset($json['location']['bookingAvailability'])) {
+            $json['location']['bookingAvailability'] = BookingAvailability::available()->serialize();
         }
 
         return $json;
