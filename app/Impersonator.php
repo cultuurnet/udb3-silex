@@ -45,7 +45,7 @@ class Impersonator
         $metadata = $metadata->serialize();
 
         $this->userId = $metadata['user_id'];
-        $this->jwt = $metadata['auth_jwt'] ?? null;
+        $this->jwt = new JsonWebToken($metadata['auth_jwt'], true) ?? null;
         $this->apiKey = $metadata['auth_api_key'] ?? null;
     }
 }

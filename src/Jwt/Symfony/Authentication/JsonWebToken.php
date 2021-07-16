@@ -125,10 +125,6 @@ class JsonWebToken extends AbstractToken
 
     public function getClientId(): ?string
     {
-        if ($this->token === null) {
-            return null;
-        }
-
         // Check first if the token has the claim, to prevent an OutOfBoundsException (thrown if the default is set to
         // null and the claim is missing).
         if ($this->token->hasClaim('azp')) {

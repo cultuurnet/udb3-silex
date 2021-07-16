@@ -29,7 +29,7 @@ final class ContextFactory
         }
 
         if ($jwt) {
-            $contextValues['auth_jwt'] = $jwt;
+            $contextValues['auth_jwt'] = (string) $jwt;
         }
 
         if ($jwt && $jwt->getClientId()) {
